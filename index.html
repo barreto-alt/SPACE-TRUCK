@@ -75,7 +75,7 @@ td.warn{color:#9a6700}
 </div>
 
 <div id="tab-dash" class="tab-panel active">
-  <div class="section-label">Indicadores YTD 2026 — Jan a Jun</div>
+  <div class="section-label" id="kpi-label">Indicadores YTD 2026</div>
   <div class="kpi-grid" id="kpi-grid">
     <div class="kpi" style="--c:#58a6ff"><div class="kpi-label">Vendas SPACE</div><div class="kpi-val" id="kpi-space-vendas">—</div><div class="kpi-sub" id="kpi-space-vendas-sub">—</div><span class="kpi-badge" id="kpi-space-vendas-badge"></span></div>
     <div class="kpi" style="--c:#3fb950"><div class="kpi-label">Vendas CUBATÃO</div><div class="kpi-val" id="kpi-cub-vendas">—</div><div class="kpi-sub" id="kpi-cub-vendas-sub">—</div><span class="kpi-badge" id="kpi-cub-vendas-badge"></span></div>
@@ -484,14 +484,17 @@ function buildCharts(data) {
   const spVA       = annualTotals(getRows(data,'SPACE','Vendas'));
   const cbVA       = annualTotals(getRows(data,'CUBATAO','Vendas'));
 
-  // KPIs
-  const spYTD25=ytd(spV25), spYTD26=ytd(spV26);
-  const cbYTD25=ytd(cbV25), cbYTD26=ytd(cbV26);
-  const spL26=ytd(monthly(getRows(data,'SPACE','Lucro'),2026));
-  const spL25=ytd(monthly(getRows(data,'SPACE','Lucro'),2025));
-  setKPI('kpi-space-vendas', spYTD26, `Jan–Jun 2025: ${fmtM(spYTD25)}`, (spYTD26/spYTD25-1)*100);
-  setKPI('kpi-cub-vendas',   cbYTD26, `Jan–Jun 2025: ${fmtM(cbYTD25)}`, (cbYTD26/cbYTD25-1)*100);
-  setKPI('kpi-grupo-vendas', spYTD26+cbYTD26, `Jan–Jun 2025: ${fmtM(spYTD25+cbYTD25)}`, ((spYTD26+cbYTD26)/(spYTD25+cbYTD25)-1)*100);
+  // KPIs — detecta último mês com dados em 2026
+  const nMeses = spV26.filter(v=>v!=null).length || 6;
+  const mesLabel = MESES[nMeses-1];
+  document.getElementById('kpi-label').textContent = `Indicadores YTD 2026 — Jan a ${mesLabel}`;
+  const spYTD25=ytd(spV25,nMeses), spYTD26=ytd(spV26,nMeses);
+  const cbYTD25=ytd(cbV25,nMeses), cbYTD26=ytd(cbV26,nMeses);
+  const spL26=ytd(monthly(getRows(data,'SPACE','Lucro'),2026),nMeses);
+  const spL25=ytd(monthly(getRows(data,'SPACE','Lucro'),2025),nMeses);
+  setKPI('kpi-space-vendas', spYTD26, `Jan–${mesLabel} 2025: ${fmtM(spYTD25)}`, (spYTD26/spYTD25-1)*100);
+  setKPI('kpi-cub-vendas',   cbYTD26, `Jan–${mesLabel} 2025: ${fmtM(cbYTD25)}`, (cbYTD26/cbYTD25-1)*100);
+  setKPI('kpi-grupo-vendas', spYTD26+cbYTD26, `Jan–${mesLabel} 2025: ${fmtM(spYTD25+cbYTD25)}`, ((spYTD26+cbYTD26)/(spYTD25+cbYTD25)-1)*100);
   const lucroEl = document.getElementById('kpi-space-lucro');
   lucroEl.textContent = (spL26<0?'–':'+')+fmtM(Math.abs(spL26));
   lucroEl.style.color = spL26<0?'#d29922':'#3fb950';
