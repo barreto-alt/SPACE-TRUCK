@@ -484,8 +484,8 @@ function buildCharts(data) {
   const spVA       = annualTotals(getRows(data,'SPACE','Vendas'));
   const cbVA       = annualTotals(getRows(data,'CUBATAO','Vendas'));
 
-  // KPIs — detecta último mês com dados em 2026
-  const nMeses = spV26.filter(v=>v!=null).length || 6;
+  // KPIs — altere nMeses para mudar o período YTD (1=Jan, 8=Ago, 9=Set...)
+  const nMeses = 8;
   const mesLabel = MESES[nMeses-1];
   document.getElementById('kpi-label').textContent = `Indicadores YTD 2026 — Jan a ${mesLabel}`;
   const spYTD25=ytd(spV25,nMeses), spYTD26=ytd(spV26,nMeses);
