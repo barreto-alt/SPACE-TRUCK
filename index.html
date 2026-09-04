@@ -427,3 +427,432 @@ init();
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SPACE TRUCK — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+
+.header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid #21262d;padding:22px 36px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:22px;font-weight:700;color:#fff;letter-spacing:1px}
+.header p{font-size:12px;color:#6e7681;margin-top:3px}
+.badge{background:#0d2137;color:#58a6ff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:1px solid #1f4068}
+
+.tab-bar{background:#161b22;border-bottom:1px solid #21262d;padding:0 36px;display:flex;position:sticky;top:0;z-index:100}
+.tab-btn{padding:13px 20px;font-size:13px;font-weight:600;color:#6e7681;cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:all .2s}
+.tab-btn:hover{color:#c9d1d9}
+.tab-btn.active{color:#58a6ff;border-bottom-color:#58a6ff}
+
+.tab-panel{display:none;padding:28px 36px 48px}
+.tab-panel.active{display:block}
+
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#58a6ff;margin-bottom:14px;margin-top:32px;padding-left:10px;border-left:3px solid #58a6ff}
+.section-label:first-child{margin-top:0}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.kpi{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c,#58a6ff)}
+.kpi-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#6e7681;margin-bottom:8px}
+.kpi-val{font-size:24px;font-weight:700;color:#fff;line-height:1}
+.kpi-sub{font-size:11px;color:#6e7681;margin-top:6px}
+.kpi-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-top:5px}
+.badge-up{background:#0d2b1e;color:#3fb950}
+.badge-dn{background:#2b0d0d;color:#f85149}
+.badge-nt{background:#1e1e0d;color:#d29922}
+
+.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:20px}
+.chart-card h3{font-size:12px;font-weight:700;color:#c9d1d9;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.cw{position:relative;height:210px}
+.cw.tall{height:250px}
+
+.table-wrap{overflow-x:auto;border:1px solid #21262d;border-radius:8px;margin-bottom:28px}
+.section-block{margin-bottom:32px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+thead th{background:#161b22;color:#8b949e;font-weight:700;font-size:11px;padding:10px;text-align:right;border-bottom:2px solid #21262d;white-space:nowrap}
+thead th.col-label{text-align:left;min-width:100px}
+tbody tr{border-bottom:1px solid #161b22}
+tbody tr:hover{background:#161b22}
+td{padding:8px 10px;text-align:right;white-space:nowrap}
+td.row-label{text-align:left;font-weight:600;color:#e6edf3;background:#0d1117}
+td.nil{color:#3d444d}
+.total-row td{background:#161b22;font-weight:700;color:#fff;border-top:2px solid #21262d}
+.total-row td.row-label{color:#58a6ff}
+.media-row td{color:#8b949e;font-style:italic;font-size:11px}
+td.pos{color:#3fb950}
+td.neg{color:#f85149}
+td.warn{color:#d29922}
+
+#loading{position:fixed;inset:0;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px}
+#loading p{color:#6e7681;font-size:14px}
+.spinner{width:36px;height:36px;border:3px solid #21262d;border-top-color:#58a6ff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#error-banner{display:none;background:#2b0d0d;border:1px solid #f85149;color:#f85149;padding:12px 20px;border-radius:8px;margin-bottom:20px;font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Carregando dados do Supabase…</p>
+</div>
+
+<div class="header">
+  <div>
+    <h1>SPACE TRUCK</h1>
+    <p>Dashboard de Resultados · Box Space</p>
+  </div>
+  <span class="badge" id="last-update">—</span>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('dash',this)">📊 Dashboard</button>
+  <button class="tab-btn" onclick="showTab('space',this)">SPACE</button>
+  <button class="tab-btn" onclick="showTab('cubatao',this)">CUBATÃO</button>
+  <button class="tab-btn" onclick="showTab('grupo',this)">GRUPO</button>
+  <button class="tab-btn" onclick="showTab('mc',this)">MC</button>
+  <button class="tab-btn" onclick="showTab('saldo',this)">Saldo</button>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div id="tab-dash" class="tab-panel active">
+  <div id="error-banner"></div>
+  <div class="section-label">Indicadores YTD 2026 — Jan a Jun</div>
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi" style="--c:#58a6ff"><div class="kpi-label">Vendas SPACE</div><div class="kpi-val" id="kpi-space-vendas">—</div><div class="kpi-sub" id="kpi-space-vendas-sub">—</div><span class="kpi-badge" id="kpi-space-vendas-badge"></span></div>
+    <div class="kpi" style="--c:#3fb950"><div class="kpi-label">Vendas CUBATÃO</div><div class="kpi-val" id="kpi-cub-vendas">—</div><div class="kpi-sub" id="kpi-cub-vendas-sub">—</div><span class="kpi-badge" id="kpi-cub-vendas-badge"></span></div>
+    <div class="kpi" style="--c:#8957e5"><div class="kpi-label">Vendas GRUPO</div><div class="kpi-val" id="kpi-grupo-vendas">—</div><div class="kpi-sub" id="kpi-grupo-vendas-sub">—</div><span class="kpi-badge" id="kpi-grupo-vendas-badge"></span></div>
+    <div class="kpi" style="--c:#d29922"><div class="kpi-label">Lucro SPACE YTD</div><div class="kpi-val" id="kpi-space-lucro" style="font-size:20px">—</div><div class="kpi-sub" id="kpi-space-lucro-sub">—</div><span class="kpi-badge" id="kpi-space-lucro-badge"></span></div>
+  </div>
+
+  <div class="section-label">Vendas Mensais — 2024 · 2025 · 2026</div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3><span class="dot" style="background:#58a6ff"></span>SPACE — Vendas Mensais</h3><div class="cw"><canvas id="cSpaceVendas"></canvas></div></div>
+    <div class="chart-card"><h3><span class="dot" style="background:#3fb950"></span>CUBATÃO — Vendas Mensais</h3><div class="cw"><canvas id="cCubVendas"></canvas></div></div>
+  </div>
+
+  <div class="section-label">Receitas × Despesas SPACE</div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3><span class="dot" style="background:#58a6ff"></span>2025</h3><div class="cw"><canvas id="cRecDesp25"></canvas></div></div>
+    <div class="chart-card"><h3><span class="dot" style="background:#3fb950"></span>2026 (YTD)</h3><div class="cw"><canvas id="cRecDesp26"></canvas></div></div>
+  </div>
+
+  <div class="section-label">Evolução Histórica</div>
+  <div class="chart-grid-3">
+    <div class="chart-card"><h3><span class="dot" style="background:#8957e5"></span>Vendas Anuais — GRUPO</h3><div class="cw tall"><canvas id="cGrupoAnual"></canvas></div></div>
+    <div class="chart-card"><h3><span class="dot" style="background:#d29922"></span>Lucro Anual — SPACE</h3><div class="cw tall"><canvas id="cLucroAnual"></canvas></div></div>
+  </div>
+
+  <div class="section-label">CMV % × Lucratividade — SPACE</div>
+  <div class="chart-grid-2">
+    <div class="chart-card"><h3><span class="dot" style="background:#f85149"></span>CMV % das Vendas</h3><div class="cw"><canvas id="cCMV"></canvas></div></div>
+    <div class="chart-card"><h3><span class="dot" style="background:#3fb950"></span>Lucratividade %</h3><div class="cw"><canvas id="cLucrat"></canvas></div></div>
+  </div>
+
+  <div class="section-label">SPACE vs CUBATÃO — Vendas Anuais</div>
+  <div class="chart-card" style="margin-bottom:32px">
+    <h3>Comparativo SPACE × CUBATÃO (2022–2025)</h3>
+    <div class="cw tall"><canvas id="cSpaceVsCub"></canvas></div>
+  </div>
+</div>
+
+<!-- TABLE TABS (rendered dynamically) -->
+<div id="tab-space"   class="tab-panel"></div>
+<div id="tab-cubatao" class="tab-panel"></div>
+<div id="tab-grupo"   class="tab-panel"></div>
+<div id="tab-mc"      class="tab-panel"></div>
+<div id="tab-saldo"   class="tab-panel"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG — preencha com suas credenciais
+// ══════════════════════════════════════════════
+const SUPABASE_URL  = 'https://pzjhmsfgzlasburqnssh.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6amhtc2Znemxhc2J1cnFuc3NoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNzkyMjQsImV4cCI6MjEwMzk1NTIyNH0.c4Lzeyn3O-W8WiIEb5y9D53NLMig6x2lKoqMkJX-Xww';
+// ══════════════════════════════════════════════
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const MESES   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const ANOS    = Array.from({length:13},(_,i)=>2014+i);
+const M_COLS  = ['jan','fev','mar','abr','mai','jun','jul','ago','set_val','out_val','nov','dez'];
+const gc      = '#ffffff0e';
+const lc      = '#6e7681';
+
+Chart.defaults.color = lc;
+Chart.defaults.borderColor = gc;
+Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
+
+const fmtM = v => v==null?null: v>=1e6?'R$'+(v/1e6).toFixed(1)+'M': v>=1e3?'R$'+(v/1e3).toFixed(0)+'k': 'R$'+v.toFixed(0);
+const fmtFull = v => v==null?'—':'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function baseOpts(yfmt) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:10,padding:14,color:'#8b949e',font:{size:11}}},
+      tooltip:{backgroundColor:'#1c2128',borderColor:'#30363d',borderWidth:1,
+        callbacks:{label:c=>c.raw==null?'':' '+(yfmt?c.raw.toFixed(1)+'%':fmtM(c.raw))}}
+    },
+    scales:{
+      x:{grid:{color:gc},ticks:{color:lc,font:{size:10}}},
+      y:{grid:{color:gc},ticks:{color:lc,font:{size:10},callback:v=>yfmt?v.toFixed(1)+'%':fmtM(v)}}
+    }
+  };
+}
+
+// ── helpers ──
+function getRows(data, unidade, metrica) {
+  return data.filter(r=>r.unidade===unidade && r.metrica===metrica)
+             .sort((a,b)=>a.ano-b.ano);
+}
+function monthly(rows, ano) {
+  const r = rows.find(r=>r.ano===ano);
+  if (!r) return Array(12).fill(null);
+  return M_COLS.map(c=>r[c]);
+}
+function annualTotals(rows) {
+  return ANOS.map(a=>{ const r=rows.find(r=>r.ano===a); return r?r.total:null; });
+}
+
+// ── KPI helpers ──
+function ytd(monthly_arr, months=6) {
+  return monthly_arr.slice(0,months).reduce((s,v)=>s+(v||0),0);
+}
+function setKPI(id, val, sub, pct, positive) {
+  document.getElementById(id).textContent = fmtM(val)||'—';
+  if(document.getElementById(id+'-sub')) document.getElementById(id+'-sub').textContent = sub;
+  const badge = document.getElementById(id+'-badge');
+  if(badge && pct!=null) {
+    const up = pct>=0;
+    badge.textContent = (up?'▲ +':'▼ ')+Math.abs(pct).toFixed(1)+'%';
+    badge.className = 'kpi-badge '+(up?'badge-up':'badge-dn');
+  }
+}
+
+// ── TABLE BUILDER ──
+const METRICS_ORDER = ['Compras','Vendas','Receitas','Despesas','CMV','Recebimento','Lucro','Lucratividade','Prolabore','PLLucro'];
+const METRIC_LABELS = {CMV:'CMV (%)',Recebimento:'% Recebimento',Lucratividade:'Lucratividade (%)',Prolabore:'Pró-labore',PLLucro:'PL + Lucro'};
+const PCT_METRICS   = new Set(['CMV','Recebimento','Lucratividade']);
+
+function buildTabTables(containerId, unidade, data) {
+  const el = document.getElementById(containerId);
+  let html = '';
+  const metrics = [...new Set(data.filter(r=>r.unidade===unidade).map(r=>r.metrica))];
+  const ordered = METRICS_ORDER.filter(m=>metrics.includes(m));
+
+  for (const metrica of ordered) {
+    const rows = getRows(data, unidade, metrica);
+    const isPct = PCT_METRICS.has(metrica);
+    const label = METRIC_LABELS[metrica]||metrica;
+
+    const thYears = ANOS.map(a=>`<th>${a}</th>`).join('');
+    let tbody = '';
+    MESES.forEach((mes,mi) => {
+      const cells = ANOS.map(ano => {
+        const r = rows.find(r=>r.ano===ano);
+        const v = r ? r[M_COLS[mi]] : null;
+        return cellHtml(v, isPct);
+      }).join('');
+      tbody += `<tr><td class="row-label">${mes}</td>${cells}</tr>`;
+    });
+    // total row
+    const totCells = ANOS.map(ano => {
+      const r = rows.find(r=>r.ano===ano);
+      return cellHtml(r?r.total:null, isPct);
+    }).join('');
+    tbody += `<tr class="total-row"><td class="row-label">TOTAL</td>${totCells}</tr>`;
+    const medCells = ANOS.map(ano => {
+      const r = rows.find(r=>r.ano===ano);
+      return cellHtml(r?r.media:null, isPct);
+    }).join('');
+    tbody += `<tr class="media-row"><td class="row-label">Média</td>${medCells}</tr>`;
+
+    html += `<div class="section-block">
+      <div class="section-label">${label}</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th class="col-label">Mês</th>${thYears}</tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function cellHtml(v, isPct) {
+  if (v==null) return '<td class="nil">—</td>';
+  if (isPct) {
+    const pct = v*100;
+    const cls = pct<0?'neg':(pct>0&&pct<2?'warn':'');
+    return `<td class="${cls}">${pct.toFixed(1)}%</td>`;
+  }
+  const cls = v<0?'neg':'';
+  return `<td class="${cls}">${fmtFull(v)}</td>`;
+}
+
+// ── CHARTS ──
+function buildCharts(data) {
+  const spV25 = monthly(getRows(data,'SPACE','Vendas'),2025);
+  const spV26 = monthly(getRows(data,'SPACE','Vendas'),2026);
+  const spV24 = monthly(getRows(data,'SPACE','Vendas'),2024);
+  const cbV25 = monthly(getRows(data,'CUBATAO','Vendas'),2025);
+  const cbV26 = monthly(getRows(data,'CUBATAO','Vendas'),2026);
+  const cbV24 = monthly(getRows(data,'CUBATAO','Vendas'),2024);
+  const spR25 = monthly(getRows(data,'SPACE','Receitas'),2025);
+  const spR26 = monthly(getRows(data,'SPACE','Receitas'),2026);
+  const spD25 = monthly(getRows(data,'SPACE','Despesas'),2025);
+  const spD26 = monthly(getRows(data,'SPACE','Despesas'),2026);
+
+  const spLucroA   = annualTotals(getRows(data,'SPACE','Lucro'));
+  const grpVendasA = annualTotals(getRows(data,'GRUPO','Vendas'));
+  const spCMVa     = annualTotals(getRows(data,'SPACE','CMV')).map(v=>v?v*100:null);
+  const spLuca     = annualTotals(getRows(data,'SPACE','Lucratividade')).map(v=>v?v*100:null);
+  const spVA       = annualTotals(getRows(data,'SPACE','Vendas')).slice(0,12);
+  const cbVA       = annualTotals(getRows(data,'CUBATAO','Vendas')).slice(0,12);
+
+  // KPIs
+  const spYTD25 = ytd(spV25); const spYTD26 = ytd(spV26);
+  const cbYTD25 = ytd(cbV25); const cbYTD26 = ytd(cbV26);
+  const spL26 = ytd(monthly(getRows(data,'SPACE','Lucro'),2026));
+  const spL25 = ytd(monthly(getRows(data,'SPACE','Lucro'),2025));
+
+  setKPI('kpi-space-vendas', spYTD26, `Jan–Jun 2025: ${fmtM(spYTD25)}`, (spYTD26/spYTD25-1)*100);
+  setKPI('kpi-cub-vendas',   cbYTD26, `Jan–Jun 2025: ${fmtM(cbYTD25)}`, (cbYTD26/cbYTD25-1)*100);
+  setKPI('kpi-grupo-vendas', spYTD26+cbYTD26, `Jan–Jun 2025: ${fmtM(spYTD25+cbYTD25)}`, ((spYTD26+cbYTD26)/(spYTD25+cbYTD25)-1)*100);
+  const lucroEl = document.getElementById('kpi-space-lucro');
+  lucroEl.textContent = (spL26<0?'–':'+')+fmtM(Math.abs(spL26));
+  lucroEl.style.color = spL26<0?'#d29922':'#3fb950';
+  document.getElementById('kpi-space-lucro-sub').textContent = `Jan–Jun 2025: ${spL25<0?'–':'+'}${fmtM(Math.abs(spL25))}`;
+  const lucBadge = document.getElementById('kpi-space-lucro-badge');
+  const lucMelhora = spL26 - spL25;
+  lucBadge.textContent = (lucMelhora>=0?'▲ Melhora ':'▼ Piora ')+fmtM(Math.abs(lucMelhora));
+  lucBadge.className = 'kpi-badge '+(lucMelhora>=0?'badge-up':'badge-dn');
+
+  const anos14_26 = ANOS.map(String);
+  const anos14_25 = ANOS.slice(0,12).map(String);
+
+  new Chart(document.getElementById('cSpaceVendas'),{type:'line',data:{labels:MESES,datasets:[
+    {label:'2024',data:spV24,borderColor:'#58a6ff33',borderWidth:1.5,pointRadius:2,tension:.3,fill:false},
+    {label:'2025',data:spV25,borderColor:'#58a6ff88',borderWidth:2,pointRadius:3,tension:.3,fill:false},
+    {label:'2026',data:spV26,borderColor:'#58a6ff',borderWidth:2.5,pointRadius:4,tension:.3,fill:false}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cCubVendas'),{type:'line',data:{labels:MESES,datasets:[
+    {label:'2024',data:cbV24,borderColor:'#3fb95033',borderWidth:1.5,pointRadius:2,tension:.3,fill:false},
+    {label:'2025',data:cbV25,borderColor:'#3fb95088',borderWidth:2,pointRadius:3,tension:.3,fill:false},
+    {label:'2026',data:cbV26,borderColor:'#3fb950',borderWidth:2.5,pointRadius:4,tension:.3,fill:false}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cRecDesp25'),{type:'bar',data:{labels:MESES,datasets:[
+    {label:'Receitas',data:spR25,backgroundColor:'#58a6ff55',borderColor:'#58a6ff',borderWidth:1,borderRadius:3},
+    {label:'Despesas',data:spD25,backgroundColor:'#f8514955',borderColor:'#f85149',borderWidth:1,borderRadius:3}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cRecDesp26'),{type:'bar',data:{labels:MESES,datasets:[
+    {label:'Receitas',data:spR26,backgroundColor:'#58a6ff55',borderColor:'#58a6ff',borderWidth:1,borderRadius:3},
+    {label:'Despesas',data:spD26,backgroundColor:'#f8514955',borderColor:'#f85149',borderWidth:1,borderRadius:3}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cGrupoAnual'),{type:'bar',data:{labels:anos14_26,datasets:[
+    {label:'Vendas Grupo',data:grpVendasA,backgroundColor:grpVendasA.map((_,i)=>i>=11?'#8957e5':'#8957e566'),borderColor:'#8957e5',borderWidth:1,borderRadius:4}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cLucroAnual'),{type:'bar',data:{labels:anos14_26,datasets:[
+    {label:'Lucro SPACE',data:spLucroA,backgroundColor:spLucroA.map(v=>v==null?'#8957e566':v>=0?'#3fb95088':'#f8514988'),borderColor:spLucroA.map(v=>v==null?'#8957e5':v>=0?'#3fb950':'#f85149'),borderWidth:1,borderRadius:4}
+  ]},options:baseOpts()});
+
+  new Chart(document.getElementById('cCMV'),{type:'line',data:{labels:anos14_26,datasets:[
+    {label:'CMV %',data:spCMVa,borderColor:'#f85149',backgroundColor:'#f8514920',borderWidth:2.5,pointRadius:4,tension:.3,fill:true}
+  ]},options:baseOpts(true)});
+
+  new Chart(document.getElementById('cLucrat'),{type:'line',data:{labels:anos14_26,datasets:[
+    {label:'Lucratividade %',data:spLuca,borderColor:'#3fb950',backgroundColor:'#3fb95020',borderWidth:2.5,pointRadius:4,pointBackgroundColor:spLuca.map(v=>v==null||v<0?'#f85149':'#3fb950'),tension:.3,fill:true}
+  ]},options:baseOpts(true)});
+
+  const anos22_25 = ['2022','2023','2024','2025'];
+  new Chart(document.getElementById('cSpaceVsCub'),{type:'bar',data:{labels:anos22_25,datasets:[
+    {label:'SPACE',data:spVA.slice(8,12),backgroundColor:'#58a6ff77',borderColor:'#58a6ff',borderWidth:1,borderRadius:4},
+    {label:'CUBATÃO',data:cbVA.slice(8,12),backgroundColor:'#3fb95077',borderColor:'#3fb950',borderWidth:1,borderRadius:4}
+  ]},options:baseOpts()});
+}
+
+// ── SALDO TAB ──
+function buildSaldo(saldo) {
+  const dates = [...new Set(saldo.map(r=>r.data_ref))].sort();
+  const space = saldo.filter(r=>r.unidade==='SPACE');
+  const cub   = saldo.filter(r=>r.unidade==='CUBATAO');
+  const spContas = [...new Set(space.map(r=>r.conta))];
+  const cbContas = [...new Set(cub.map(r=>r.conta))];
+
+  function buildSaldoTable(rows, contas, title) {
+    const ths = contas.map(c=>`<th>${c}</th>`).join('');
+    let tbody = '';
+    dates.forEach(d => {
+      const cells = contas.map(c => {
+        const r = rows.find(r=>r.data_ref===d&&r.conta===c);
+        const v = r?r.valor:null;
+        if(v==null) return '<td class="nil">—</td>';
+        return `<td class="${v<0?'neg':''}">${fmtFull(v)}</td>`;
+      }).join('');
+      tbody += `<tr><td class="row-label">${new Date(d+'T12:00').toLocaleDateString('pt-BR')}</td>${cells}</tr>`;
+    });
+    return `<div class="section-block"><div class="section-label">${title}</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th class="col-label">Data</th>${ths}</tr></thead>
+        <tbody>${tbody}</tbody>
+      </table></div></div>`;
+  }
+
+  document.getElementById('tab-saldo').innerHTML =
+    buildSaldoTable(space, spContas, 'Saldo 2026 — SPACE') +
+    buildSaldoTable(cub,   cbContas, 'Saldo 2026 — CUBATÃO');
+}
+
+// ── MAIN LOAD ──
+async function init() {
+  try {
+    const [{ data: resultados, error: e1 }, { data: saldo, error: e2 }] = await Promise.all([
+      sb.from('resultados').select('*'),
+      sb.from('saldo').select('*')
+    ]);
+    if (e1||e2) throw new Error((e1||e2).message);
+
+    buildCharts(resultados);
+    buildTabTables('tab-space',   'SPACE',   resultados);
+    buildTabTables('tab-cubatao', 'CUBATAO', resultados);
+    buildTabTables('tab-grupo',   'GRUPO',   resultados);
+    buildTabTables('tab-mc',      'MC',      resultados);
+    buildSaldo(saldo);
+
+    const now = new Date().toLocaleString('pt-BR');
+    document.getElementById('last-update').textContent = 'Atualizado: '+now;
+    document.getElementById('loading').style.display = 'none';
+  } catch(err) {
+    document.getElementById('loading').style.display = 'none';
+    const b = document.getElementById('error-banner');
+    b.style.display = 'block';
+    b.textContent = '⚠️ Erro ao carregar dados: '+err.message+'. Verifique as credenciais do Supabase no topo do arquivo index.html.';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
