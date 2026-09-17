@@ -661,6 +661,11 @@ function buildImportacao() {
     const c = v < 0 ? '#dc2626' : v < 0.15 ? '#d97706' : '#16a34a';
     return `<span style="color:${c};font-weight:700">${(v*100).toFixed(1)}%</span>`;
   };
+  const pctVenda = (venda, estimado) => {
+    if (!venda) return '<span style="color:#94a3b8;font-size:11px">Sem preço</span>';
+    const m = (venda - estimado) / venda;
+    return pct(m);
+  };
 
   const sorted = [...IMPORTACAO].sort((a,b) => b.margem - a.margem);
   const rows = sorted.map((r,i) => `
@@ -672,6 +677,7 @@ function buildImportacao() {
       <td style="text-align:right;padding:9px 8px;white-space:nowrap">${usd(r.fob)}</td>
       <td style="text-align:right;padding:9px 8px;white-space:nowrap">${brl(r.estimado)}</td>
       <td style="text-align:center;padding:9px 8px">${pct(r.margem)}</td>
+      <td style="text-align:center;padding:9px 8px">${pctVenda(r.venda, r.estimado)}</td>
     </tr>`).join('');
 
   const positivos = IMPORTACAO.filter(r=>r.margem>=0.15).length;
@@ -705,7 +711,8 @@ function buildImportacao() {
           <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">Target BR</th>
           <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">FOB China</th>
           <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">Est. na Porta</th>
-          <th style="padding:10px 8px;text-align:center;color:#475569;font-weight:600;white-space:nowrap">Margem</th>
+          <th style="padding:10px 8px;text-align:center;color:#475569;font-weight:600;white-space:nowrap">Margem Target</th>
+          <th style="padding:10px 8px;text-align:center;color:#475569;font-weight:600;white-space:nowrap">Margem Venda</th>
         </tr>
       </thead>
       <tbody>
