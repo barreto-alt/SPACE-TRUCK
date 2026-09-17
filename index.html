@@ -663,7 +663,7 @@ function buildImportacao() {
   };
   const pctVenda = (venda, estimado) => {
     if (!venda) return '<span style="color:#94a3b8;font-size:11px">Sem preço</span>';
-    const m = (venda - estimado) / venda;
+    const m = (venda - estimado) / estimado;
     return pct(m);
   };
 
