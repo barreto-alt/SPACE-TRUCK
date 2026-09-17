@@ -72,6 +72,7 @@ td.warn{color:#9a6700}
   <button class="tab-btn" onclick="showTab('grupo',this)">GRUPO</button>
   <button class="tab-btn" onclick="showTab('mc',this)">MC</button>
   <button class="tab-btn" onclick="showTab('saldo',this)">Saldo</button>
+  <button class="tab-btn" onclick="showTab('importacao',this)">🌏 Importação</button>
 </div>
 
 <div id="tab-dash" class="tab-panel active">
@@ -113,7 +114,8 @@ td.warn{color:#9a6700}
 <div id="tab-cubatao" class="tab-panel"></div>
 <div id="tab-grupo"   class="tab-panel"></div>
 <div id="tab-mc"      class="tab-panel"></div>
-<div id="tab-saldo"   class="tab-panel"></div>
+<div id="tab-saldo"      class="tab-panel"></div>
+<div id="tab-importacao" class="tab-panel"></div>
 
 <script>
 // ══════════════════════════════════════════════
@@ -233,43 +235,43 @@ const RESULTADOS = [
 {u:'CUBATAO',m:'Compras',a:2023,v:[53991.65,45566.32,76941.48,52168.58,74501.25,49024.05,71180.28,79063.30,78657.20,86779.80,83959.65,46092.33],tot:797925.89,med:66493.82},
 {u:'CUBATAO',m:'Compras',a:2024,v:[39882.27,67048.67,57151.40,81503.84,47375.10,89182.19,106522.06,117297.03,108252.20,118900.46,86483.92,61180.97],tot:980780.11,med:81731.68},
 {u:'CUBATAO',m:'Compras',a:2025,v:[167792.00,83733.00,136637.62,170966.79,373813.58,132443.45,215038.00,276851.00,276632.00,385088.83,204440.00,229231.00],tot:2652667.27,med:221055.61},
-{u:'CUBATAO',m:'Compras',a:2026,v:[175372.37,227119.42,168002.75,372250.23,458351.90,442153.57,328112.65,410532.55,33717.56,null,null,null],tot:2615613.00,med:280219.33},
+{u:'CUBATAO',m:'Compras',a:2026,v:[268892.16,180159.60,214039.46,175731.99,228041.82,293435.24,287975.80,318537.43,null,null,null,null],tot:1966813.50,med:245851.69},
 // CUBATAO - Vendas
 {u:'CUBATAO',m:'Vendas',a:2022,v:[11525.70,9582.94,16524.76,23701.92,35692.02,37172.30,49300.45,58482.67,61672.70,58155.38,60206.37,69241.10],tot:491258.31,med:40938.19},
 {u:'CUBATAO',m:'Vendas',a:2023,v:[108281.55,106423.99,132270.50,132736.00,141430.40,123281.30,136372.20,167782.10,146251.20,153350.66,144664.55,100055.70],tot:1592900.15,med:132741.68},
 {u:'CUBATAO',m:'Vendas',a:2024,v:[129896.52,119090.17,140447.52,160079.86,158259.09,182012.73,228123.38,240876.08,245147.28,218209.81,190954.66,180059.59],tot:2193156.69,med:182763.06},
 {u:'CUBATAO',m:'Vendas',a:2025,v:[195773.35,254667.71,278314.92,297231.00,345397.39,447286.45,509765.00,523003.00,565856.76,521700.77,530921.00,492394.00],tot:4962311.35,med:413525.95},
-{u:'CUBATAO',m:'Vendas',a:2026,v:[433966.39,384434.06,545744.77,590952.15,569029.95,645599.75,767513.22,658352.00,109257.98,null,null,null],tot:4704850.27,med:504825.46},
+{u:'CUBATAO',m:'Vendas',a:2026,v:[431329.39,397333.05,314781.87,332449.15,374171.50,369166.85,448599.22,425592.54,304576.73,null,null,null],tot:3398000.30,med:377555.59},
 // CUBATAO - Receitas
 {u:'CUBATAO',m:'Receitas',a:2022,v:[15088.28,17112.73,15759.30,29723.33,27271.54,33258.88,34582.46,47272.66,63140.32,56650.10,52457.31,60973.73],tot:453290.64,med:37774.22},
 {u:'CUBATAO',m:'Receitas',a:2023,v:[62216.63,66560.79,82769.64,83307.74,95942.20,85429.81,94123.05,103344.11,93941.71,99242.46,106140.52,120002.13],tot:1093020.79,med:91085.07},
 {u:'CUBATAO',m:'Receitas',a:2024,v:[62597.06,76985.25,98125.63,96167.57,106411.93,114418.24,141417.26,155313.31,164461.50,164002.80,127003.38,136120.34],tot:1443024.27,med:120252.02},
 {u:'CUBATAO',m:'Receitas',a:2025,v:[122390.72,158595.00,197609.13,209653.86,229148.73,299625.86,346901.00,388605.00,378823.57,365407.00,355557.00,386073.00],tot:3438389.87,med:286532.49},
-{u:'CUBATAO',m:'Receitas',a:2026,v:[344281.55,426542.20,284222.46,460177.97,464807.14,542120.00,null,null,null,null,null,null],tot:2522151.32,med:420358.55},
+{u:'CUBATAO',m:'Receitas',a:2026,v:[327680.29,399572.99,182608.63,298349.63,344348.65,379753.36,448771.14,429101.82,null,null,null,null],tot:2810186.51,med:351273.31},
 // CUBATAO - Despesas
 {u:'CUBATAO',m:'Despesas',a:2022,v:[2985.96,3566.98,3528.93,20548.38,14779.44,30844.24,20300.33,32034.09,51035.15,56992.57,56004.42,58225.73],tot:350846.22,med:29237.19},
 {u:'CUBATAO',m:'Despesas',a:2023,v:[61270.24,67340.69,75367.68,92271.09,79258.40,93588.55,84719.24,99836.82,106927.85,128007.74,138574.21,102019.10],tot:1129181.61,med:94098.47},
 {u:'CUBATAO',m:'Despesas',a:2024,v:[90565.88,95473.03,85828.61,100653.21,112274.38,107127.09,133946.17,167429.04,160749.09,198511.99,136120.34,156998.19],tot:1545677.02,med:128806.42},
 {u:'CUBATAO',m:'Despesas',a:2025,v:[150113.00,159530.44,163956.30,214740.20,227290.18,287604.00,284176.00,310699.00,421904.97,434704.00,379634.00,392283.00],tot:3426635.09,med:285552.92},
-{u:'CUBATAO',m:'Despesas',a:2026,v:[441060.08,292183.39,342509.00,345011.69,407127.67,527835.00,null,null,null,null,null,null],tot:2355726.83,med:392621.14},
+{u:'CUBATAO',m:'Despesas',a:2026,v:[428444.20,280735.05,321900.19,296610.60,341444.26,411081.99,437901.14,482843.83,null,null,null,null],tot:3000961.26,med:375120.16},
 // CUBATAO - CMV
 {u:'CUBATAO',m:'CMV',a:2022,v:[0.3403,0.1431,0.2544,0.2384,0.6015,0.5039,0.4680,0.5509,0.6321,0.7208,0.7238,0.5817],tot:0.5606,med:0.5606},
 {u:'CUBATAO',m:'CMV',a:2023,v:[0.4986,0.4282,0.5817,0.3930,0.5268,0.3977,0.5220,0.4712,0.5378,0.5659,0.5804,0.4607],tot:0.5009,med:0.5009},
 {u:'CUBATAO',m:'CMV',a:2024,v:[0.3070,0.5630,0.4069,0.5091,0.2994,0.4900,0.4669,0.4870,0.4416,0.5449,0.4529,0.3398],tot:null,med:0.4424},
 {u:'CUBATAO',m:'CMV',a:2025,v:[0.8571,0.3288,0.4909,0.5752,1.0823,0.2961,0.4218,0.5293,0.4889,0.7381,0.3851,0.4655],tot:6.6592,med:0.5549},
-{u:'CUBATAO',m:'CMV',a:2026,v:[0.4041,0.5908,0.3078,0.6299,0.8055,0.6849,0.4275,0.6236,0.3086,null,null,null],tot:0.5559,med:0.5551},
+{u:'CUBATAO',m:'CMV',a:2026,v:[0.6234,0.4534,0.6800,0.5286,0.6095,0.7949,0.6419,0.7485,null,null,null,null],tot:0.6350,med:0.6350},
 // CUBATAO - Lucro
 {u:'CUBATAO',m:'Lucro',a:2022,v:[12102.32,13545.75,12230.37,9174.95,12492.10,2414.64,14282.13,15238.57,12105.17,-342.47,-3547.11,2748.00],tot:102444.42,med:8537.04},
 {u:'CUBATAO',m:'Lucro',a:2023,v:[946.39,-779.90,7401.96,-8963.35,16683.80,-8158.74,9403.81,3507.29,-12986.14,-28765.28,-32433.69,17983.03],tot:-36160.82,med:-3013.40},
 {u:'CUBATAO',m:'Lucro',a:2024,v:[-27968.82,-18487.78,12297.02,-4485.64,-5862.45,7291.15,7471.09,-12115.73,3712.41,-34509.19,-9116.96,-20877.85],tot:-102652.75,med:-8554.40},
 {u:'CUBATAO',m:'Lucro',a:2025,v:[-27722.28,-935.44,33652.83,-5086.34,1858.55,12021.86,62725.00,77906.00,-43081.40,-69297.00,-24077.00,-6210.00],tot:11754.78,med:979.57},
-{u:'CUBATAO',m:'Lucro',a:2026,v:[-96778.53,134358.81,-58286.54,115166.28,57679.47,14285.00,null,null,null,null,null,null],tot:166424.49,med:13868.71},
+{u:'CUBATAO',m:'Lucro',a:2026,v:[-100763.91,118837.94,-139291.56,1739.03,2904.39,-31328.63,10870.00,-53742.01,null,null,null,null],tot:-190774.75,med:-23846.84},
 // CUBATAO - Lucratividade
 {u:'CUBATAO',m:'Lucratividade',a:2022,v:[0.8021,0.7916,0.7761,0.3087,0.4581,0.0726,0.4130,0.3224,0.1917,-0.0060,-0.0676,0.0451],tot:0.2260,med:0.2260},
 {u:'CUBATAO',m:'Lucratividade',a:2023,v:[0.0152,-0.0117,0.0894,-0.1076,0.1739,-0.0955,0.0999,0.0339,-0.1382,-0.2898,-0.3056,0.1499],tot:-0.0331,med:-0.0331},
 {u:'CUBATAO',m:'Lucratividade',a:2024,v:[-0.4468,-0.2401,0.1253,-0.0466,-0.0551,0.0637,0.0528,-0.0780,0.0226,-0.2104,-0.0718,-0.1534],tot:-0.0711,med:-0.0711},
 {u:'CUBATAO',m:'Lucratividade',a:2025,v:[-0.2265,-0.0059,0.1703,-0.0243,0.0081,0.0401,0.1808,0.2005,-0.1137,-0.1896,-0.0677,-0.0161],tot:0.0034,med:0.0034},
-{u:'CUBATAO',m:'Lucratividade',a:2026,v:[-0.2811,0.3150,-0.2051,0.2503,0.1241,0.0264,null,null,null,null,null,null],tot:0.0660,med:0.0330},
+{u:'CUBATAO',m:'Lucratividade',a:2026,v:[0.6301,0.7469,0.6573,0.6364,0.6969,0.6813,0.6658,0.6139,null,null,null,null],tot:0.6661,med:0.6661},
 // GRUPO - Vendas
 {u:'GRUPO',m:'Vendas',a:2014,v:[161273.35,156286.13,184256.27,173484.32,182632.06,171486.45,157985.45,173430.30,155662.87,176677.67,161256.86,148347.89],tot:2002779.62,med:166898.30},
 {u:'GRUPO',m:'Vendas',a:2015,v:[169647.88,157819.85,208822.23,174101.86,215758.79,160434.98,178961.64,168077.46,172616.65,180819.28,161145.54,143698.85],tot:2091905.01,med:174325.42},
@@ -311,6 +313,14 @@ const RESULTADOS = [
 {u:'MC',m:'Lucro',a:2025,v:[-27722.28,-935.44,33652.83,-5086.34,1858.55,12021.86,62725.00,77906.00,-43081.40,-69297.00,-24077.00,-6210.00],tot:11754.78,med:979.57},
 // MC - Lucratividade
 {u:'MC',m:'Lucratividade',a:2025,v:[-0.2265,-0.0059,0.1703,-0.0243,0.0081,0.0401,0.1808,0.2005,-0.1137,-0.1896,-0.0677,-0.0161],tot:0.0034,med:0.0034},
+// MC 2026
+{u:'MC',m:'Vendas',a:2026,v:[28393.00,44950.00,230962.90,258503.00,195153.35,276432.90,309718.00,214414.50,null,null,null,null],tot:1558527.65,med:194815.96},
+{u:'MC',m:'Receitas',a:2026,v:[16601.26,26969.21,101613.83,161828.34,120458.49,162367.28,227514.55,113696.61,null,null,null,null],tot:931049.57,med:116381.20},
+{u:'MC',m:'Despesas',a:2026,v:[12615.88,11448.34,72296.70,118665.73,154528.55,199695.31,194774.30,123042.62,null,null,null,null],tot:887067.43,med:110883.43},
+{u:'MC',m:'Compras',a:2026,v:[8003.31,6045.23,67076.44,95060.19,121289.79,164133.60,167969.34,75174.20,null,null,null,null],tot:704752.10,med:88094.01},
+{u:'MC',m:'CMV',a:2026,v:[0.2819,0.1345,0.2904,0.3677,0.4692,0.6349,0.6498,0.3507,null,null,null,null],tot:0.3974,med:0.3974},
+{u:'MC',m:'Lucro',a:2026,v:[3985.38,15520.87,29317.13,43162.61,-34070.06,-37328.03,32740.25,-9346.01,null,null,null,null],tot:43982.14,med:5497.77},
+{u:'MC',m:'Lucratividade',a:2026,v:[0.8375,0.8798,0.9774,0.9087,0.8297,0.8714,0.9135,0.7767,null,null,null,null],tot:0.8743,med:0.8743},
 ];
 
 // Converte para formato compatível com funções originais
@@ -353,6 +363,42 @@ const SALDO = [
   {data_ref:'2026-02-01',unidade:'CUBATAO',conta:'Sicredi',valor:29265},
   {data_ref:'2026-02-01',unidade:'CUBATAO',conta:'Itau',valor:2950},
   {data_ref:'2026-02-01',unidade:'CUBATAO',conta:'Caixa2',valor:0},
+  // AGOSTO 2026 — início
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Mercado Pago',valor:532.74},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Sicredi',valor:22489.18},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Inter',valor:123.69},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Bradesco',valor:272040.17},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Magalu Play',valor:0},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Caixa Econom',valor:8.13},
+  {data_ref:'2026-08-01',unidade:'CUBATAO',conta:'Aplic Caixa',valor:0},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Mercado Pago',valor:172.89},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Sicredi',valor:32000.00},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Inter',valor:0},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Bradesco',valor:0},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Magalu Play',valor:0},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Caixa Econom',valor:30560.96},
+  {data_ref:'2026-08-01',unidade:'MC',conta:'Aplic Caixa',valor:0},
+  {data_ref:'2026-08-01',unidade:'APARECIDA',conta:'Mercado Pago',valor:26.73},
+  {data_ref:'2026-08-01',unidade:'APARECIDA',conta:'Sicredi',valor:166.33},
+  {data_ref:'2026-08-01',unidade:'APARECIDA',conta:'Inter',valor:0},
+  // AGOSTO 2026 — término
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Mercado Pago',valor:17156.20},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Sicredi',valor:19253.98},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Inter',valor:123.69},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Bradesco',valor:204918.03},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Magalu Play',valor:0},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Caixa Ecom',valor:0},
+  {data_ref:'2026-08-31',unidade:'CUBATAO',conta:'Aplic Caixa',valor:0},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Mercado Pago',valor:10756.84},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Sicredi',valor:21989.04},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Inter',valor:0},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Bradesco',valor:0},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Magalu Play',valor:0},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Caixa Ecom',valor:20641.96},
+  {data_ref:'2026-08-31',unidade:'MC',conta:'Aplic Caixa',valor:0},
+  {data_ref:'2026-08-31',unidade:'APARECIDA',conta:'Mercado Pago',valor:3384.78},
+  {data_ref:'2026-08-31',unidade:'APARECIDA',conta:'Sicredi',valor:71.12},
+  {data_ref:'2026-08-31',unidade:'APARECIDA',conta:'Inter',valor:0},
 ];
 
 // ══════════════════════════════════════════════
@@ -498,7 +544,7 @@ function buildCharts(data) {
   const lucroEl = document.getElementById('kpi-space-lucro');
   lucroEl.textContent = (spL26<0?'–':'+')+fmtM(Math.abs(spL26));
   lucroEl.style.color = spL26<0?'#d29922':'#3fb950';
-  document.getElementById('kpi-space-lucro-sub').textContent = `Jan–Jun 2025: ${spL25<0?'–':'+'}${fmtM(Math.abs(spL25))}`;
+  document.getElementById('kpi-space-lucro-sub').textContent = `Jan–${mesLabel} 2025: ${spL25<0?'–':'+'}${fmtM(Math.abs(spL25))}`;
   const lucBadge = document.getElementById('kpi-space-lucro-badge');
   const lucMelhora = spL26-spL25;
   lucBadge.textContent = (lucMelhora>=0?'▲ Melhora ':'▼ Piora ')+fmtM(Math.abs(lucMelhora));
@@ -567,9 +613,107 @@ function buildSaldo(saldo) {
         <tbody>${tbody}</tbody>
       </table></div></div>`;
   }
+  const mc   = saldo.filter(r=>r.unidade==='MC');
+  const apar = saldo.filter(r=>r.unidade==='APARECIDA');
+  const mcContas   = [...new Set(mc.map(r=>r.conta))];
+  const apContas   = [...new Set(apar.map(r=>r.conta))];
   document.getElementById('tab-saldo').innerHTML =
-    buildSaldoTable(space, spContas, 'Saldo 2026 — SPACE') +
-    buildSaldoTable(cub,   cbContas, 'Saldo 2026 — CUBATÃO');
+    buildSaldoTable(space, spContas, 'Saldo — SPACE') +
+    buildSaldoTable(cub,   cbContas, 'Saldo — CUBATÃO') +
+    (mc.length   ? buildSaldoTable(mc,   mcContas, 'Saldo — MC AUTO PEÇAS') : '') +
+    (apar.length ? buildSaldoTable(apar, apContas, 'Saldo — APARECIDA VARIEDADES') : '');
+}
+
+// ── IMPORTAÇÃO ──────────────────────────────────────────────────────────────
+const IMPORTACAO = [
+  {id:1,  produto:'ROSCA DO FILTRO 1.12 UNF, ROSCA LATERAL 16MM',                url:'https://www.mercadolivre.com.br/cabecote-filtro-racor-co...',  venda:202.70,  target:88.31,  fob:6.50,  estimado:78.00,  margem:0.132179},
+  {id:2,  produto:'ROSCA DO FILTRO 1.14 UNF, ROSCA LATERAL 16MM',                url:'https://www.mercadolivre.com.br/cabecote-filtro-racor-16...',  venda:199.99,  target:88.31,  fob:5.00,  estimado:60.00,  margem:0.471833},
+  {id:3,  produto:'Macaco Bomba Bascular Cabine Compatível Volvo VM / Scania',    url:'https://www.mercadolivre.com.br/macaco-bomba-bascular-ca...',  venda:299.99,  target:144.00, fob:10.00, estimado:120.00, margem:0.200000},
+  {id:4,  produto:'MATERIAL DE BORRACHA E TAMANHO 210MM',                        url:'https://www.mercadolivre.com.br/extensao-prolongador-fle...',  venda:14.54,   target:3.63,   fob:0.33,  estimado:3.96,   margem:-0.083333},
+  {id:5,  produto:'Material de plástico, comprimento 170mm',                     url:'https://www.mercadolivre.com.br/kit-10-extensoes-prolong...',  venda:35.99,   target:1.22,   fob:0.08,  estimado:0.96,   margem:0.270833},
+  {id:6,  produto:'FAROL PRINCIPAL SCANIA SÉRIE 5 P/G/R 2009+ LE/LD',           url:'https://www.mercadolivre.com.br/farol-scania-2011-2012-2...',  venda:409.99,  target:203.56, fob:38.00, estimado:380.00, margem:-0.464316},
+  {id:7,  produto:'Seta Pisca LED — ligação de fios',                            url:'https://www.mercadolivre.com.br/par-lanterna-dianteira-s...',  venda:319.99,  target:93.69,  fob:6.00,  estimado:72.00,  margem:0.301250},
+  {id:8,  produto:'Conector lanterna pisca seta LED',                            url:'https://www.mercadolivre.com.br/2-lanterna-pisca-seta-le...',  venda:279.99,  target:77.63,  fob:7.65,  estimado:91.80,  margem:-0.154357},
+  {id:9,  produto:'VÁLVULA PEDAL FREIO MB / VOLVO',                              url:'https://www.mercadolivre.com.br/valvula-pedal-freio-mb-1...',  venda:222.99,  target:111.96, fob:8.00,  estimado:96.00,  margem:0.166250},
+  {id:10, produto:'VÁLVULA FREIO MÃO MBB / VOLVO — SL',                         url:'https://www.mercadolivre.com.br/valvula-freio-de-mao-mer...',  venda:215.99,  target:111.29, fob:3.45,  estimado:41.40,  margem:1.688164},
+  {id:11, produto:'BOMBA BASCULAMENTO S4 / BOMBA BASCULAR CABINE',               url:'https://www.mercadolivre.com.br/bomba-macaco-basculament...',  venda:299.99,  target:189.00, fob:7.00,  estimado:84.00,  margem:1.250000},
+  {id:12, produto:'FAROL AUXILIAR VW NOVO DELIVERY LE',                          url:'https://www.mercadolivre.com.br/2-farol-milha-auxiliar-v...',  venda:539.99,  target:169.48, fob:5.00,  estimado:60.00,  margem:1.824667},
+  {id:13, produto:'FAROL PRINCIPAL VOLVO FH 2009/2014 DIR. 21035637/82304585',   url:'https://www.mercadolivre.com.br/par-farol-dianteiro-cami...',  venda:699.99,  target:193.38, fob:12.00, estimado:144.00, margem:0.342917},
+  {id:14, produto:'FAROL AUXILIAR LE — 2 FOCOS — VOLVO FH D13',                 url:'https://www.mercadolivre.com.br/par-farol-auxiliar-milha...',  venda:399.99,  target:112.20, fob:45.00, estimado:540.00, margem:-0.792222},
+  {id:15, produto:'FAROL PRINCIPAL ANGEL EYES / OLHO DE ANJO — LD/LE 7 POLOS',  url:'https://www.mercadolivre.com.br/farol-redondo-12v-e-24v-...',  venda:109.99,  target:62.76,  fob:3.78,  estimado:45.36,  margem:0.383598},
+  {id:16, produto:'ABRAÇADEIRA BORRACHA PARALAMA MB AXOR/ACTROS',                url:'https://www.mercadolivre.com.br/kit-8-presilha-mb-axor-1...',  venda:76.99,   target:5.63,   fob:0.58,  estimado:6.96,   margem:-0.191092},
+  {id:17, produto:'24W LED Headlight Bivolt 6500K 12V/24V — Retangular',         url:'https://www.mercadolivre.com.br/2-farol-milha-retangular...',  venda:null,    target:24.00,  fob:1.88,  estimado:22.56,  margem:0.063830},
+  {id:18, produto:'FAROL PRINCIPAL DUPLO FOCO FUNDO CROMADO',                    url:'https://www.mercadolivre.com.br/farol-dianteiro-para-ive...',  venda:388.90,  target:121.20, fob:7.80,  estimado:93.60,  margem:0.294872},
+  {id:19, produto:'FAROL MILHA AUX. LED MB AXOR Dir. (LED)',                     url:'https://www.mercadolivre.com.br/par-de-farol-de-milha-au...',  venda:598.00,  target:145.00, fob:9.90,  estimado:118.80, margem:0.220539},
+  {id:20, produto:'LANTERNA CARRETA FACCHINI MODERNA 2021+ LED Dir.',            url:'https://www.mercadolivre.com.br/par-lanterna-traseira-ca...',  venda:499.99,  target:175.50, fob:10.00, estimado:120.00, margem:0.462500},
+  {id:21, produto:'LANTERNA TRASEIRA LED VW ESQUERDA 2V3945095B / 2V5945095',   url:'https://www.mercadolivre.com.br/lanterna-traseira-new-vw...',  venda:487.99,  target:297.00, fob:9.90,  estimado:118.80, margem:1.500000},
+  {id:22, produto:'LANTERNA SETA LED LE VW CONSTELLATION APÓS 2023',            url:'https://www.mercadolivre.com.br/2-farois-dianteiro-pisca...',  venda:639.99,  target:201.22, fob:15.00, estimado:180.00, margem:0.117889},
+  {id:23, produto:'Cuíca de Freio 30x30 Haste Longa — VW / Iveco',              url:'https://www.mercadolivre.com.br/cuica-de-freio-30x30-has...',  venda:337.49,  target:130.46, fob:8.00,  estimado:96.00,  margem:0.358958},
+  {id:24, produto:'Lanterna Corujinha Caminhão 19 LEDs Cabine / Refil Facchini', url:'https://www.mercadolivre.com.br/lanterna-corujinha-camin...',  venda:null,    target:43.20,  fob:3.57,  estimado:42.84,  margem:0.008403},
+  {id:25, produto:'CHICOTE LANT 7V SCANIA / MB / VOLVO FÊMEA — 7665',           url:'https://www.mercadolivre.com.br/chicote-lanternas-axor-t...',  venda:null,    target:14.90,  fob:1.00,  estimado:12.00,  margem:0.241667},
+  {id:26, produto:'CHICOTE 5V LANT GUERRA / RANDON / LIBRELATO — 7760',          url:'https://produto.mercadolivre.com.br/MLB-5452754470',           venda:null,    target:5.90,   fob:0.39,  estimado:4.68,   margem:0.260684},
+];
+
+function buildImportacao() {
+  const brl = v => v==null ? '<span style="color:#94a3b8">Sem preço</span>' : 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const usd = v => '$ '+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const pct = v => {
+    const c = v < 0 ? '#dc2626' : v < 0.15 ? '#d97706' : '#16a34a';
+    return `<span style="color:${c};font-weight:700">${(v*100).toFixed(1)}%</span>`;
+  };
+
+  const rows = IMPORTACAO.map((r,i) => `
+    <tr style="background:${i%2===0?'#fff':'#f8fafc'};border-bottom:1px solid #e2e8f0">
+      <td style="color:#64748b;font-size:12px;text-align:center;padding:9px 8px">${r.id}</td>
+      <td style="padding:9px 8px;max-width:320px"><a href="${r.url}" target="_blank" style="color:#1a2340;text-decoration:none;font-size:13px" title="${r.produto}">${r.produto}</a></td>
+      <td style="text-align:right;padding:9px 8px;white-space:nowrap">${brl(r.venda)}</td>
+      <td style="text-align:right;padding:9px 8px;font-weight:600;white-space:nowrap">${brl(r.target)}</td>
+      <td style="text-align:right;padding:9px 8px;white-space:nowrap">${usd(r.fob)}</td>
+      <td style="text-align:right;padding:9px 8px;white-space:nowrap">${brl(r.estimado)}</td>
+      <td style="text-align:center;padding:9px 8px">${pct(r.margem)}</td>
+    </tr>`).join('');
+
+  const positivos = IMPORTACAO.filter(r=>r.margem>=0.15).length;
+  const negativos = IMPORTACAO.filter(r=>r.margem<0).length;
+  const atenção   = IMPORTACAO.filter(r=>r.margem>=0 && r.margem<0.15).length;
+
+  document.getElementById('tab-importacao').innerHTML = `
+    <h2 style="font-size:20px;color:#1a2340;margin-bottom:4px">🌏 Análise de Importação</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Target e viabilidade de produtos para importação da China — ${IMPORTACAO.length} produtos analisados</p>
+    <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 20px;min-width:140px">
+        <div style="font-size:22px;font-weight:700;color:#16a34a">${positivos}</div>
+        <div style="font-size:12px;color:#15803d">Viáveis (margem ≥ 15%)</div>
+      </div>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 20px;min-width:140px">
+        <div style="font-size:22px;font-weight:700;color:#d97706">${atenção}</div>
+        <div style="font-size:12px;color:#b45309">Atenção (0–15%)</div>
+      </div>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 20px;min-width:140px">
+        <div style="font-size:22px;font-weight:700;color:#dc2626">${negativos}</div>
+        <div style="font-size:12px;color:#b91c1c">Inviáveis (margem negativa)</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:#f1f5f9">
+          <th style="padding:10px 8px;text-align:center;color:#475569;font-weight:600;white-space:nowrap">#</th>
+          <th style="padding:10px 8px;text-align:left;color:#475569;font-weight:600">Produto</th>
+          <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">Venda BR</th>
+          <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">Target BR</th>
+          <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">FOB China</th>
+          <th style="padding:10px 8px;text-align:right;color:#475569;font-weight:600;white-space:nowrap">Est. na Porta</th>
+          <th style="padding:10px 8px;text-align:center;color:#475569;font-weight:600;white-space:nowrap">Margem</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+    </div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:16px">Margem = (Target − Preço estimado na porta) / Target &nbsp;·&nbsp; Verde ≥ 15% &nbsp;·&nbsp; Amarelo 0–15% &nbsp;·&nbsp; Vermelho negativo</p>
+  `;
 }
 
 // INIT
@@ -579,6 +723,7 @@ buildTabTables('tab-cubatao', 'CUBATAO', resultados);
 buildTabTables('tab-grupo',   'GRUPO',   resultados);
 buildTabTables('tab-mc',      'MC',      resultados);
 buildSaldo(SALDO);
+buildImportacao();
 document.getElementById('last-update').textContent = 'Atualizado: '+new Date().toLocaleDateString('pt-BR');
 </script>
 </body>
